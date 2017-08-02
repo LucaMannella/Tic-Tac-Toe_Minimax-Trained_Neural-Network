@@ -11,7 +11,7 @@
 # Tic-Tac-Toe Minimax-Neural Network is distributed under GNU GENERAL PUBLIC LICENSE v.3       #
 #                                                                                              #
 ################################################################################################
-
+import copy
 import logging
 import math
 
@@ -185,11 +185,19 @@ def someone_won(board):
 
 def next_move(board, player):
     """ Computes the next move for a player given the current board state.
+        If the board is full or if a player already won the game -1 is returned.
 
     :param board: The board of the game (an array of 9 elements), it must contains only [-1, 0, +1] values
     :param player: Who is the player that has to play now [ +1 (X) or -1 (O) ]
-    :return: The position where the player have to play the next move
+    :return: The position where the player have to play the next move (or -1 if no one can play)
     """
+    # Additional_checks
+    res = someone_won(board)
+    if res[0]:
+        return -1
+    elif is_tie(board):
+        return -1
+
     # If the board is empty the best move is to put your symbol in the center
     if len(set(board)) == 1:
         return 4
@@ -200,18 +208,12 @@ def next_move(board, player):
 
 def minimax(board, player):
     """ This function returns the best move and the relative score for the given player.
+        The function assumes that a move is always feasible.
 
     :param board: The board of the game (an array of 9 elements), it must contains only [-1, 0, +1] values
     :param player: Who is the player that has to play now [ +1 (X) or -1 (O) ]
     :return: The position where the player have to play the next move and the relative score
     """
-    # Termination condition
-    x = someone_won(board)
-    if x[0]:
-        return -1, x[1] * 10
-    elif is_tie(board):
-        return -1, 0
-
     # Next player initialization
     next_player = 1 if player == -1 else -1
 
@@ -221,26 +223,46 @@ def minimax(board, player):
         if board[i] == 0:
             empty_cells.append(i)
 
-    res_list = []  # list for appending the result
+    res_dict = {}  # dictionary for appending the result
     # evaluate all the possibilities
     for i in empty_cells:
         board[i] = player
         score = evaluation_function(board)
-        res_list[i] = score
+
+        # Termination condition
+        x = someone_won(board)
+        if x[0]:
+            board[i] = 0  # backtracking
+            return i, score
+        elif is_tie(board):
+            board[i] = 0  # backtracking
+            return i, score
+        else:
+            res_dict[i] = score
 
         n_move, next_score = minimax(board, next_player)
-        res_list[i] += next_score
+
+        res_dict[i] += next_score
         board[i] = 0  # backtracking
 
     # fetching the best move
+    best_move = -1
     if player == 1:
         # X is playing, we have to maximize
-        best_score = max(res_list)
-        best_move = res_list.index(best_score)
+        best_score = -1000
+        for k in res_dict.keys():
+            score = res_dict[k]
+            if score > best_score:
+                best_score = score
+                best_move = k
     else:
         # O is playing, we have to minimize
-        best_score = min(res_list)
-        best_move = res_list.index(best_score)
+        best_score = 1000
+        for k in res_dict.keys():
+            score = res_dict[k]
+            if score < best_score:
+                best_score = score
+                best_move = k
 
     return best_move, best_score
 
@@ -363,9 +385,16 @@ def test_function(board):
     logging.debug("X score is %d and O score is %d", partial_score(board, +1), partial_score(board, -1))
 
     next_p = who_is_next(board)
-    for n in next_p:
-        logging.debug("Who is next? " + str(n))
-        logging.debug(generate_output(board, n, -11))
+    for p in next_p:
+        if p != 0:
+            logging.debug("Who is next? " + str(p))
+            move = next_move(board, p)
+            logging.debug(generate_output(board, p, move))
+
+            new_board = copy.deepcopy(board)
+            new_board[move] = p
+            logging.debug("Configuration after next move:")
+            print_board(new_board)
 
 
 if __name__ == "__main__":
