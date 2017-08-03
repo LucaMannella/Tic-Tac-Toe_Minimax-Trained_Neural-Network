@@ -14,22 +14,32 @@
 import copy
 import logging
 import math
+import random
+import sys
 
+VERSION = "v0.1"
 
 COMBINATIONS = 19683
 WIN_SCORE = 10
-VERSION = "v0.1"
-OUTPUT_FILENAME = "ttt_config7.txt"
+T_T_PERC = 0.6  # Training/Testing percentage
+
+# Files
+OUTPUT_FILENAME = "ttt_config.txt"
+TRAINING_FILENAME = "nn_training.txt"
+TESTING_FILENAME = "nn_testing.txt"
 
 """ Modify these variable to enable/disable debug functionalities """
 TEST = False
+GENERATE_OUTPUT_FILE = False
+
 VERBOSE = True
 
 
-def main():
-    """ That's Main! """
+def main_generate_output(output_file_name):
+    """ This function generates all the valid combination of a Tic-Tac-Toe game and it write them on an output_file """
+    c = 0
     board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-    out_file = open(OUTPUT_FILENAME, "w")
+    out_file = open(output_file_name, "w")
 
     for i in range(3):
         if i == 0:
@@ -106,15 +116,16 @@ def main():
                                         if is_playable(board):
                                             # __loop_function is called only if the configuration is valid!
                                             __loop_function(board, out_file)
+                                            c += 1
 
     out_file.close()
-    print("Program is over! The output was written in " + OUTPUT_FILENAME)
+    print(str(c) + " combinations were generated! The output was written in " + OUTPUT_FILENAME)
 
 
 def __loop_function(board, out_file):
     """ This function is called for each valid configuration of the board.
         It looks if a player can play and then it choose the best move for the player(s).
-        It creates a configuration useful to train a neural-network according to the syntax of generate_output function,
+        It creates a configuration useful to train a neural-network according to the syntax of generate_output_string(),
         this configuration will be written on the file (already open) given as parameter.
 
     :param board: The board of the game (an array of 9 elements), it must contains only [-1, 0, +1] values
@@ -123,10 +134,10 @@ def __loop_function(board, out_file):
     players = who_is_next(board)
     for p in players:
         if p == 0:  # additional check to be sure to not generate wrong configurations
-            logging.error("Invalid configuration generated!!! ", generate_output(board, p, -11))
+            logging.error("Invalid configuration generated!!! ", generate_output_string(board, p, -11))
         else:
             move = next_move(board, p)
-            output = generate_output(board, p, move)
+            output = generate_output_string(board, p, move)
             out_file.write(output + "\n")
             if VERBOSE:
                 logging.info(output)
@@ -404,7 +415,7 @@ def __partial_score(board, player):
     return score
 
 
-def generate_output(board, p, move):
+def generate_output_string(board, p, move):
     """ This function generate a string version of the data that have to be written on the output file.
         The string does not have parenthesis, comma or any other symbols, the first nine values represents the state of
         the grid, the 10th value represent who is the next player to play and the last value is the position in which
@@ -441,6 +452,33 @@ def print_board(board):
     print(" %s | %s | %s " % (new_grid[6], new_grid[7], new_grid[8]))
 
 
+def main_generate_nn_files(source_filename, training_filename, testing_filename):
+    """ This function reads a source file and split its entry in two files, the first one for the training and the
+        second one for the testing of a neural-network according to T_T_PERC value.
+        If the output files already exists they will be overwritten.
+    """
+    c_train = 0
+    c_test = 0
+    random.seed()  # initialization of the random generator
+
+    training_file = open(training_filename, "w")
+    testing_file = open(testing_filename, "w")
+
+    with open(source_filename) as source_file:
+        for line in source_file:
+            if random.random() < T_T_PERC:
+                training_file.write(line)
+                c_train += 1
+            else:
+                testing_file.write(line)
+                c_test += 1
+
+    training_file.close()
+    testing_file.close()
+    print("The source file has been split in " + training_filename + " (" + str(c_train) + " combinations) and "
+          + testing_filename + " (" + str(c_test) + " combinations)")
+
+
 def test():
     """ This function is used to perform some testing, it should be removed in the final version of the program. """
     board1 = [1, 1, 0, -1, -1, 0, 0, 0, 0]
@@ -474,7 +512,7 @@ def test_routine(board):
         if p != 0:
             logging.debug("Who is next? " + str(p))
             move = next_move(board, p)
-            logging.debug(generate_output(board, p, move))
+            logging.debug(generate_output_string(board, p, move))
 
             new_board = copy.deepcopy(board)
             new_board[move] = p
@@ -497,5 +535,9 @@ if __name__ == "__main__":
 
     if TEST:
         test()
-    else:
-        main()
+        sys.exit()
+
+    if GENERATE_OUTPUT_FILE:
+        main_generate_output(OUTPUT_FILENAME)
+
+    main_generate_nn_files(OUTPUT_FILENAME, TRAINING_FILENAME, TESTING_FILENAME)
