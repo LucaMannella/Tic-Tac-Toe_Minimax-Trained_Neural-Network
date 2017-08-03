@@ -125,7 +125,7 @@ def main_generate_output(output_file_name):
 def __loop_function(board, out_file):
     """ This function is called for each valid configuration of the board.
         It looks if a player can play and then it choose the best move for the player(s).
-        It creates a configuration useful to train a neural-network according to the syntax of generate_output_string(),
+        It creates a configuration useful to train a neural-network according to the syntax of generate_training_string,
         this configuration will be written on the file (already open) given as parameter.
 
     :param board: The board of the game (an array of 9 elements), it must contains only [-1, 0, +1] values
@@ -134,10 +134,10 @@ def __loop_function(board, out_file):
     players = who_is_next(board)
     for p in players:
         if p == 0:  # additional check to be sure to not generate wrong configurations
-            logging.error("Invalid configuration generated!!! ", generate_output_string(board, p, -11))
+            logging.error("Invalid configuration generated!!! ", generate_training_string(board, p, -11))
         else:
             move = next_move(board, p)
-            output = generate_output_string(board, p, move)
+            output = generate_training_string(board, p, move)
             out_file.write(output + "\n")
             if VERBOSE:
                 logging.info(output)
@@ -415,7 +415,7 @@ def __partial_score(board, player):
     return score
 
 
-def generate_output_string(board, p, move):
+def generate_training_string(board, p, move):
     """ This function generate a string version of the data that have to be written on the output file.
         The string does not have parenthesis, comma or any other symbols, the first nine values represents the state of
         the grid, the 10th value represent who is the next player to play and the last value is the position in which
@@ -470,7 +470,8 @@ def main_generate_nn_files(source_filename, training_filename, testing_filename)
                 training_file.write(line)
                 c_train += 1
             else:
-                testing_file.write(line)
+                test_line = line[:-3]  # removing from the string the output move and the '\n' character
+                testing_file.write(test_line + "\n")
                 c_test += 1
 
     training_file.close()
@@ -512,7 +513,7 @@ def test_routine(board):
         if p != 0:
             logging.debug("Who is next? " + str(p))
             move = next_move(board, p)
-            logging.debug(generate_output_string(board, p, move))
+            logging.debug(generate_training_string(board, p, move))
 
             new_board = copy.deepcopy(board)
             new_board[move] = p
