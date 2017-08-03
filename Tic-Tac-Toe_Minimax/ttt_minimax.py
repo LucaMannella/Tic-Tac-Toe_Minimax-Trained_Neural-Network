@@ -21,7 +21,7 @@ WIN_SCORE = 10
 VERSION = "v0.1"
 
 """ Modify these variable to enable/disable debug functionalities """
-TEST = True
+TEST = False
 VERBOSE = True
 
 
@@ -30,21 +30,105 @@ def main():
     board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     out_file = open("ttt_config.txt", "w")
 
-    for i in range(COMBINATIONS):
-        if is_playable(board):
-            players = who_is_next(board)
-            for p in players:
-                if p == 0:  # additional check to be sure to not generate wrong configurations
-                    logging.error("Invalid configuration generated!!! ", generate_output(board, p, -11))
+    for i in range(3):
+        if i == 0:
+            board[0] = 0
+        elif i == 1:
+            board[0] = -1
+        else:
+            board[0] = 1
+
+        for i in range(3):
+            if i == 0:
+                board[1] = 0
+            elif i == 1:
+                board[1] = -1
+            else:
+                board[1] = 1
+
+            for i in range(3):
+                if i == 0:
+                    board[2] = 0
+                elif i == 1:
+                    board[2] = -1
                 else:
-                    move = next_move(board, p)
-                    output = generate_output(board, p, move)
-                    out_file.write(output)
-                    if VERBOSE:
-                        logging.info(output)
+                    board[2] = 1
+
+                for i in range(3):
+                    if i == 0:
+                        board[3] = 0
+                    elif i == 1:
+                        board[3] = -1
+                    else:
+                        board[3] = 1
+
+                    for i in range(3):
+                        if i == 0:
+                            board[4] = 0
+                        elif i == 1:
+                            board[4] = -1
+                        else:
+                            board[4] = 1
+
+                        for i in range(3):
+                            if i == 0:
+                                board[5] = 0
+                            elif i == 1:
+                                board[5] = -1
+                            else:
+                                board[5] = 1
+
+                            for i in range(3):
+                                if i == 0:
+                                    board[6] = 0
+                                elif i == 1:
+                                    board[6] = -1
+                                else:
+                                    board[6] = 1
+
+                                for i in range(3):
+                                    if i == 0:
+                                        board[7] = 0
+                                    elif i == 1:
+                                        board[7] = -1
+                                    else:
+                                        board[7] = 1
+
+                                    for i in range(3):
+                                        if i == 0:
+                                            board[8] = 0
+                                        elif i == 1:
+                                            board[8] = -1
+                                        else:
+                                            board[8] = 1
+
+                                        __loop_function(board, out_file)
 
     out_file.close()
     print("Program is over! :D")
+
+
+def __loop_function(board, out_file):
+    """ This function is called for each valid configuration of the board.
+        It looks if a player can play and then it choose the best move for the player(s).
+        It creates a configuration useful to train a neural-network according to the syntax of generate_output function,
+        this configuration will be written on the file (already open) given as parameter.
+
+    :param board: The board of the game (an array of 9 elements), it must contains only [-1, 0, +1] values
+    :param out_file: The output file on which you want to write (it must be already opened!)
+    """
+    if is_playable(board):
+        # __loop_function is called only if the configuration is valid!
+        players = who_is_next(board)
+        for p in players:
+            if p == 0:  # additional check to be sure to not generate wrong configurations
+                logging.error("Invalid configuration generated!!! ", generate_output(board, p, -11))
+            else:
+                move = next_move(board, p)
+                output = generate_output(board, p, move)
+                out_file.write(output + "\n")
+                if VERBOSE:
+                    logging.info(output)
 
 
 def is_playable(board):
@@ -202,11 +286,11 @@ def next_move(board, player):
     if len(set(board)) == 1:
         return 4
 
-    n_move, score = minimax(board, player)
+    n_move, score = __minimax(board, player)
     return n_move
 
 
-def minimax(board, player):
+def __minimax(board, player):
     """ This function returns the best move and the relative score for the given player.
         The function assumes that a move is always feasible.
 
@@ -240,7 +324,7 @@ def minimax(board, player):
         else:
             res_dict[i] = score
 
-        n_move, next_score = minimax(board, next_player)
+        n_move, next_score = __minimax(board, next_player)
 
         res_dict[i] += next_score
         board[i] = 0  # backtracking
@@ -278,13 +362,13 @@ def evaluation_function(board):
     if result[0]:
         return WIN_SCORE * result[1]
 
-    x_score = partial_score(board, 1)
-    o_score = partial_score(board, -1)
+    x_score = __partial_score(board, 1)
+    o_score = __partial_score(board, -1)
 
     return x_score - o_score
 
 
-def partial_score(board, player):
+def __partial_score(board, player):
     """ This function calculate the score of a player given the actual situation o the board.
 
     :param board: The board of the game (an array of 9 elements), it must contains only [-1, 0, +1] values
@@ -359,19 +443,19 @@ def print_board(board):
 def test():
     """ This function is used to perform some testing, it should be removed in the final version of the program. """
     board1 = [1, 1, 0, -1, -1, 0, 0, 0, 0]
-    test_function(board1)
+    test_routine(board1)
     board2 = [1, 1, 0, -1, -1, 0, 1, 0, 0]
-    test_function(board2)
+    test_routine(board2)
     board3 = [1, 0, 0, -1, -1, 0, 1, 0, -1]
-    test_function(board3)
+    test_routine(board3)
 
     w_board = [0, 0, 0, 1, 1, 1, -1, -1, 0]
     l_board = [-1, 0, 1, 1, -1, 0, 1, 0, -1]
-    test_function(w_board)
-    test_function(l_board)
+    test_routine(w_board)
+    test_routine(l_board)
 
 
-def test_function(board):
+def test_routine(board):
     """ This function performs tests on a board, it should be removed in the final version of the program. """
     print_board(board)
     res = someone_won(board)
@@ -382,7 +466,7 @@ def test_function(board):
     else:
         logging.debug("No one won")
     logging.debug("Grid score = %d", evaluation_function(board))
-    logging.debug("X score is %d and O score is %d", partial_score(board, +1), partial_score(board, -1))
+    logging.debug("X score is %d and O score is %d", __partial_score(board, +1), __partial_score(board, -1))
 
     next_p = who_is_next(board)
     for p in next_p:
@@ -406,6 +490,7 @@ if __name__ == "__main__":
     logging.info(r" / /\/\ \ | | | | | | | | | | (_| |>  <_____/ /  | | | (_| | | | | | | | | | (_| | ")
     logging.info(r" \/    \/_|_| |_|_|_| |_| |_|\__,_/_/\_\    \/   |_|  \__,_|_|_| |_|_|_| |_|\__, | ")
     logging.info(r"  Developed by Luca Mannella - July 2017                                    |___/  ")
+    logging.info(r"                                                                                   ")
     logging.getLogger().handlers[0].setFormatter(logging.Formatter(
         "%(asctime)s.%(msecs)04d %(levelname)s: %(message)s", datefmt="%H:%M:%S"))
 
