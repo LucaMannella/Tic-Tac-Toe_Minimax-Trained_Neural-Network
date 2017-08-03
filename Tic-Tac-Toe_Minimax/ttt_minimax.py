@@ -102,7 +102,9 @@ def main():
                                         else:
                                             board[8] = 1
 
-                                        __loop_function(board, out_file)
+                                        if is_playable(board):
+                                            # __loop_function is called only if the configuration is valid!
+                                            __loop_function(board, out_file)
 
     out_file.close()
     print("Program is over! :D")
@@ -117,18 +119,16 @@ def __loop_function(board, out_file):
     :param board: The board of the game (an array of 9 elements), it must contains only [-1, 0, +1] values
     :param out_file: The output file on which you want to write (it must be already opened!)
     """
-    if is_playable(board):
-        # __loop_function is called only if the configuration is valid!
-        players = who_is_next(board)
-        for p in players:
-            if p == 0:  # additional check to be sure to not generate wrong configurations
-                logging.error("Invalid configuration generated!!! ", generate_output(board, p, -11))
-            else:
-                move = next_move(board, p)
-                output = generate_output(board, p, move)
-                out_file.write(output + "\n")
-                if VERBOSE:
-                    logging.info(output)
+    players = who_is_next(board)
+    for p in players:
+        if p == 0:  # additional check to be sure to not generate wrong configurations
+            logging.error("Invalid configuration generated!!! ", generate_output(board, p, -11))
+        else:
+            move = next_move(board, p)
+            output = generate_output(board, p, move)
+            out_file.write(output + "\n")
+            if VERBOSE:
+                logging.info(output)
 
 
 def is_playable(board):
