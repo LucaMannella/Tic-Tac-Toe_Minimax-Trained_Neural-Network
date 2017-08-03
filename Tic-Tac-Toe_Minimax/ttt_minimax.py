@@ -19,6 +19,7 @@ import math
 COMBINATIONS = 19683
 WIN_SCORE = 10
 VERSION = "v0.1"
+OUTPUT_FILENAME = "ttt_config7.txt"
 
 """ Modify these variable to enable/disable debug functionalities """
 TEST = False
@@ -28,7 +29,7 @@ VERBOSE = True
 def main():
     """ That's Main! """
     board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-    out_file = open("ttt_config.txt", "w")
+    out_file = open(OUTPUT_FILENAME, "w")
 
     for i in range(3):
         if i == 0:
@@ -107,7 +108,7 @@ def main():
                                             __loop_function(board, out_file)
 
     out_file.close()
-    print("Program is over! :D")
+    print("Program is over! The output was written in " + OUTPUT_FILENAME)
 
 
 def __loop_function(board, out_file):
