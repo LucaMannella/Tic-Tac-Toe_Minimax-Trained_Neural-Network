@@ -37,70 +37,70 @@ VERBOSE = True
 
 def main_generate_output(output_file_name):
     """ This function generates all the valid combination of a Tic-Tac-Toe game and it write them on an output_file """
-    c = 0
+    count = 0
     board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     out_file = open(output_file_name, "w")
 
-    for i in range(3):
-        if i == 0:
+    for a in range(3):
+        if a == 0:
             board[0] = 0
-        elif i == 1:
+        elif a == 1:
             board[0] = -1
         else:
             board[0] = 1
 
-        for i in range(3):
-            if i == 0:
+        for b in range(3):
+            if b == 0:
                 board[1] = 0
-            elif i == 1:
+            elif b == 1:
                 board[1] = -1
             else:
                 board[1] = 1
 
-            for i in range(3):
-                if i == 0:
+            for c in range(3):
+                if c == 0:
                     board[2] = 0
-                elif i == 1:
+                elif c == 1:
                     board[2] = -1
                 else:
                     board[2] = 1
 
-                for i in range(3):
-                    if i == 0:
+                for d in range(3):
+                    if d == 0:
                         board[3] = 0
-                    elif i == 1:
+                    elif d == 1:
                         board[3] = -1
                     else:
                         board[3] = 1
 
-                    for i in range(3):
-                        if i == 0:
+                    for e in range(3):
+                        if e == 0:
                             board[4] = 0
-                        elif i == 1:
+                        elif e == 1:
                             board[4] = -1
                         else:
                             board[4] = 1
 
-                        for i in range(3):
-                            if i == 0:
+                        for f in range(3):
+                            if f == 0:
                                 board[5] = 0
-                            elif i == 1:
+                            elif f == 1:
                                 board[5] = -1
                             else:
                                 board[5] = 1
 
-                            for i in range(3):
-                                if i == 0:
+                            for g in range(3):
+                                if g == 0:
                                     board[6] = 0
-                                elif i == 1:
+                                elif g == 1:
                                     board[6] = -1
                                 else:
                                     board[6] = 1
 
-                                for i in range(3):
-                                    if i == 0:
+                                for h in range(3):
+                                    if h == 0:
                                         board[7] = 0
-                                    elif i == 1:
+                                    elif h == 1:
                                         board[7] = -1
                                     else:
                                         board[7] = 1
@@ -116,10 +116,10 @@ def main_generate_output(output_file_name):
                                         if is_playable(board):
                                             # __loop_function is called only if the configuration is valid!
                                             __loop_function(board, out_file)
-                                            c += 1
+                                            count += 1
 
     out_file.close()
-    print(str(c) + " combinations were generated! The output was written in " + OUTPUT_FILENAME)
+    print(str(count) + " valid configuration were generated! The output was written in " + OUTPUT_FILENAME)
 
 
 def __loop_function(board, out_file):
