@@ -1,5 +1,7 @@
 # PyCharm stuff
 .idea/
+# mypy
+.mypy_cache/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -100,5 +102,5 @@ ENV/
 # mkdocs documentation
 /site
 
-# mypy
-.mypy_cache/
+# Matlab tmp files
+*.asv
