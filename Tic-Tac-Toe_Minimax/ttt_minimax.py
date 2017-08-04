@@ -17,7 +17,7 @@ import math
 import random
 import sys
 
-VERSION = "v0.1"
+VERSION = "v0.2"
 
 COMBINATIONS = 19683
 WIN_SCORE = 10
@@ -27,10 +27,13 @@ T_T_PERC = 0.6  # Training/Testing percentage
 OUTPUT_FILENAME = "ttt_config.txt"
 TRAINING_FILENAME = "nn_training.txt"
 TESTING_FILENAME = "nn_testing.txt"
+MATLAB_INPUT = "nn_input.txt"
+MATLAB_OUTPUT = "nn_output.txt"
 
 """ Modify these variable to enable/disable debug functionalities """
 TEST = False
 GENERATE_OUTPUT_FILE = False
+FOR_MATLAB = True
 
 VERBOSE = True
 
@@ -120,6 +123,7 @@ def main_generate_output(output_file_name):
 
     out_file.close()
     print(str(count) + " valid configuration were generated! The output was written in " + OUTPUT_FILENAME)
+    return
 
 
 def __loop_function(board, out_file):
@@ -141,6 +145,8 @@ def __loop_function(board, out_file):
             out_file.write(output + "\n")
             if VERBOSE:
                 logging.info(output)
+
+    return
 
 
 def is_playable(board):
@@ -450,6 +456,7 @@ def print_board(board):
     print(" %s | %s | %s " % (new_grid[3], new_grid[4], new_grid[5]))
     print("-----------")
     print(" %s | %s | %s " % (new_grid[6], new_grid[7], new_grid[8]))
+    return
 
 
 def main_generate_nn_files(source_filename, training_filename, testing_filename):
@@ -461,23 +468,39 @@ def main_generate_nn_files(source_filename, training_filename, testing_filename)
     c_test = 0
     random.seed()  # initialization of the random generator
 
-    training_file = open(training_filename, "w")
-    testing_file = open(testing_filename, "w")
+    if FOR_MATLAB:
+        count = 0
+        input_file = open(MATLAB_INPUT, "w")
+        output_file = open(MATLAB_OUTPUT, "w")
 
-    with open(source_filename) as source_file:
-        for line in source_file:
-            if random.random() < T_T_PERC:
-                training_file.write(line)
-                c_train += 1
-            else:
-                test_line = line[:-3]  # removing from the string the output move and the '\n' character
-                testing_file.write(test_line + "\n")
-                c_test += 1
+        with open(source_filename) as source_file:
+            for line in source_file:
+                count += 1
+                input_line = line[:-3]  # removing from the string the output move and the '\n' character
+                output_line = line.strip()[-1]  # taking the last value of the string
 
-    training_file.close()
-    testing_file.close()
-    print("The source file has been split in " + training_filename + " (" + str(c_train) + " combinations) and "
-          + testing_filename + " (" + str(c_test) + " combinations)")
+                input_file.write(input_line + "\n")
+                output_file.write(output_line + "\n")
+            print("The source file contains " + str(count) + " entries.")
+    else:
+        training_file = open(training_filename, "w")
+        testing_file = open(testing_filename, "w")
+
+        with open(source_filename) as source_file:
+            for line in source_file:
+                if random.random() < T_T_PERC:
+                    training_file.write(line)
+                    c_train += 1
+                else:
+                    testing_line = line[:-3]  # removing from the string the output move and the '\n' character
+                    testing_file.write(testing_line + "\n")
+                    c_test += 1
+
+        training_file.close()
+        testing_file.close()
+        print("The source file has been split in " + training_filename + " (" + str(c_train) + " combinations) and " +
+              testing_filename + " (" + str(c_test) + " combinations)")
+    return
 
 
 def test():
@@ -493,6 +516,7 @@ def test():
     l_board = [-1, 0, 1, 1, -1, 0, 1, 0, -1]
     test_routine(w_board)
     test_routine(l_board)
+    return
 
 
 def test_routine(board):
@@ -520,17 +544,19 @@ def test_routine(board):
             logging.debug("Configuration after next move:")
             print_board(new_board)
 
+    return
+
 
 if __name__ == "__main__":
+    print(r"         _       _                          _____           _       _    (!) %s    " % VERSION)
+    print(r"   /\/\ (_)_ __ (_)_ __ ___   __ ___  __   /__   \_ __ __ _(_)_ __ (_)_ __   __ _  ")
+    print(r"  /    \| | '_ \| | '_ ` _ \ / _` \ \/ /____ / /\/ '__/ _` | | '_ \| | '_ \ / _` | ")
+    print(r" / /\/\ \ | | | | | | | | | | (_| |>  <_____/ /  | | | (_| | | | | | | | | | (_| | ")
+    print(r" \/    \/_|_| |_|_|_| |_| |_|\__,_/_/\_\    \/   |_|  \__,_|_|_| |_|_|_| |_|\__, | ")
+    print(r"  Developed by Luca Mannella - July 2017                                    |___/  ")
+    print(r"                                                                                   ")
     logging.basicConfig(format="%(message)s")
     logging.getLogger().setLevel(level=logging.DEBUG)
-    logging.info(r"         _       _                          _____           _       _    (!) %s    ", VERSION)
-    logging.info(r"   /\/\ (_)_ __ (_)_ __ ___   __ ___  __   /__   \_ __ __ _(_)_ __ (_)_ __   __ _  ")
-    logging.info(r"  /    \| | '_ \| | '_ ` _ \ / _` \ \/ /____ / /\/ '__/ _` | | '_ \| | '_ \ / _` | ")
-    logging.info(r" / /\/\ \ | | | | | | | | | | (_| |>  <_____/ /  | | | (_| | | | | | | | | | (_| | ")
-    logging.info(r" \/    \/_|_| |_|_|_| |_| |_|\__,_/_/\_\    \/   |_|  \__,_|_|_| |_|_|_| |_|\__, | ")
-    logging.info(r"  Developed by Luca Mannella - July 2017                                    |___/  ")
-    logging.info(r"                                                                                   ")
     logging.getLogger().handlers[0].setFormatter(logging.Formatter(
         "%(asctime)s.%(msecs)04d %(levelname)s: %(message)s", datefmt="%H:%M:%S"))
 
