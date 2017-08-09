@@ -14,6 +14,7 @@
 import copy
 import logging
 import math
+import os
 import random
 import sys
 
@@ -25,10 +26,10 @@ T_T_PERC = 0.6  # Training/Testing percentage
 
 # Files
 OUTPUT_FILENAME = "ttt_config.txt"
-TRAINING_FILENAME = "nn_training.txt"
-TESTING_FILENAME = "nn_testing.txt"
-MATLAB_INPUT = "nn_input.txt"
-MATLAB_OUTPUT = "nn_output.txt"
+TRAINING_FILENAME = os.path.join("..", "files", "nn_training.txt")
+TESTING_FILENAME = os.path.join("..", "files", "nn_testing.txt")
+MATLAB_INPUT = os.path.join("..", "files", "nn_input.txt")
+MATLAB_OUTPUT = os.path.join("..", "files", "nn_output.txt")
 
 """ Modify these variable to enable/disable debug functionalities """
 TEST = False
