@@ -2,7 +2,8 @@ function [outputs, errors, performance, nRightValues] = NeuralNetwork(inputs, ta
 
     %% Create a Pattern Recognition Network with hiddenLayerSize neurons
     nRightValues = 0;
-    net = patternnet(hiddenLayerSize);
+    net = feedforwardnet(hiddenLayerSize);
+    net = configure(net, inputs, targets);
 
     % Setup Division of Data for Training, Validation, Testing
     net.divideParam.trainRatio = trainingPerc;
@@ -14,7 +15,7 @@ function [outputs, errors, performance, nRightValues] = NeuralNetwork(inputs, ta
 
     % Test the Network
     outputs = net(inputs);
-    errors = gsubtract(targets, outputs);
+    errors = abs(gsubtract(targets, outputs));
     performance = perform(net, targets, outputs);
 
     outputs = round(outputs);
