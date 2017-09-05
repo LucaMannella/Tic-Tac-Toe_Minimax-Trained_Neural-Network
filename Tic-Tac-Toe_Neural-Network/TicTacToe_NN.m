@@ -21,6 +21,7 @@ trainingPerc = 60/100;
 validatingPerc = 0;
 testingPerc = 40/100;
 
+disp('Training: 60/100 - Testing: 40/100')
 NN_Train_Test(length(targets), inputs, targets, trainingPerc, validatingPerc, testingPerc)
 
 %% Training, validating, testing = [50, 10, 40]
@@ -28,6 +29,7 @@ trainingPerc = 50/100;
 validatingPerc = 10/100;
 testingPerc = 40/100;
 
+disp('Training: 50/100 - Validating: 10/100 - Testing: 40/100')
 NN_Train_Test(length(targets), inputs, targets, trainingPerc, validatingPerc, testingPerc)
 
 %% Training, validating, testing = [70, 15, 15]
@@ -35,6 +37,7 @@ trainingPerc = 70/100;
 validatingPerc = 15/100;
 testingPerc = 15/100;
 
+disp('Training: 70/100 - Validating: 15/100 - Testing: 15/100')
 NN_Train_Test(length(targets), inputs, targets, trainingPerc, validatingPerc, testingPerc)
 
 %% Training, validating, testing = [90, 0, 10]
@@ -42,4 +45,5 @@ trainingPerc = 90/100;
 validatingPerc = 0;
 testingPerc = 10/100;
 
+disp('Training: 90/100 - Testing: 10/100')
 NN_Train_Test(length(targets), inputs, targets, trainingPerc, validatingPerc, testingPerc)
